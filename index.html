@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Шоколадный Шик - Изысканные десерты</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #1C0A0A;
+            --secondary-color: #3D1C1C;
+            --accent-color: #D4A762;
+            --background-color: #FFF8E7;
+            --text-color: #2C1810;
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Montserrat', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+        }
+
+        header {
+            background-color: rgba(28, 10, 10, 0.8);
+            color: var(--background-color);
+            padding: 1.5em 2em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.8em;
+            margin: 0;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            margin: 0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        #cart-button {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            border-radius: 30px;
+            padding: 0.5em 1.5em;
+            font-size: 1em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        #cart-button:hover {
+            background-color: var(--background-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #cart-button span {
+            margin-left: 0.5em;
+        }
+
+        #cart-count {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 0.5em;
+        }
+
+        nav {
+            background-color: rgba(61, 28, 28, 0.8);
+            padding: 1em;
+            text-align: center;
+            position: sticky;
+            top: 80px;
+            z-index: 999;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        nav button {
+            background-color: transparent;
+            border: none;
+            color: var(--background-color);
+            padding: 0.5em 1em;
+            margin: 0 0.5em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        nav button::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--accent-color);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        nav button:hover::before {
+            transform: translateX(0);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 120px auto 0;
+            padding: 2em;
+        }
+
+        .product-container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.5em;
+        }
+
+        @media (max-width: 1200px) {
+            .product-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        @media (max-width: 992px) {
+            .product-container {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .product-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .product-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .product {
+            background-color: #fff;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .product:hover {
+            transform: translateY(-10px) rotateY(10deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .product img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .product:hover img {
+            transform: scale(1.1) translateZ(20px);
+        }
+
+        .product-info {
+            padding: 1.5em;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 20%);
+            transform: translateZ(30px);
+        }
+
+        .product h3 {
+            font-family: var(--font-heading);
+            font-size: 1.1em;
+            margin: 0 0 0.5em 0;
+            color: var(--primary-color);
+            transition: color 0.3s ease;
+        }
+
+        .product:hover h3 {
+            color: var(--accent-color);
+        }
+
+        .add-to-cart {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+            border: none;
+            padding: 0.8em 1.5em;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            font-weight: 600;
+            display: block;
+            width: 100%;
+            text-align: center;
+            margin-top: 1em;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(40px);
+        }
+
+        .add-to-cart::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: all 0.6s;
+        }
+
+        .add-to-cart:hover::before {
+            left: 100%;
+        }
+
+        .add-to-cart:hover {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            transform: translateY(-2px) translateZ(50px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .product-category {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 0.3em 0.8em;
+            border-radius: 15px;
+            font-size: 0.8em;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            transform: translateZ(20px);
+        }
+
+        .product:hover .product-category {
+            background-color: var(--accent-color);
+            color: var(--background-color);
+        }
+
+        .price-tag {
+            font-weight: bold;
+            color: var(--accent-color);
+            margin-bottom: 0.5em;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .price-tag::after {
+            content: 'UZS';
+            font-size: 0.8em;
+            margin-left: 0.2em;
+        }
+
+        .product-description {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+            margin-bottom: 1em;
+            flex-grow: 1;
+        }
+
+        .map-container {
+            margin-top: 3em;
+            padding: 0 10px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .map-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, var(--primary-color), transparent);
+            opacity: 0.3;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .map-container iframe {
+            width: 100%;
+            height: 450px;
+            border: none;
+            position: relative;
+            z-index: 2;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--background-color);
+            text-align: center;
+            padding: 2em;
+            margin-top: 3em;
+        }
+
+        .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 1em;
+            margin-top: 1em;
+        }
+
+        .social-icons a {
+            color: var(--background-color);
+            font-size: 1.5em;
+            transition: color 0.3s ease;
+        }
+
+        .social-icons a:hover {
+            color: var(--accent-color);
+        }
+
+        #cart-popup {
+            display: none;
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background-color: var(--background-color);
+            padding: 2em;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 80%;
+            width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        #cart-popup.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        #cart-popup h2 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 0.5em;
+            margin-bottom: 1em;
+            font-family: var(--font-heading);
+        }
+
+        .cart-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1em;
+            padding: 1em;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .cart-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .cart-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-right: 1em;
+        }
+
+        .cart-item-details {
+            flex-grow: 1;
+        }
+
+        .cart-item-name {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .cart-item-price {
+            color: var(--secondary-color);
+        }
+
+        #cart-total {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin: 1em 0;
+            text-align: right;
+            color: var(--primary-color);
+        }
+
+        #close-cart, #order-#close-cart, #order-button {
+            padding: 0.8em 1.5em;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        #close-cart {
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            margin-right: 1em;
+        }
+
+        #order-button {
+            background-color: var(--accent-color);
+            color: var(--primary-color);
+        }
+
+        #close-cart:hover, #order-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay.show {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .add-to-cart-animation {
+            animation: bounce 0.5s ease;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #loadMore {
+            display: block;
+            margin: 2em auto;
+            padding: 0.8em 1.5em;
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        #loadMore:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        #chocolate-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .chocolate-rain {
+            position: fixed;
+            top: -100px;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .chocolate-drop {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #3D1C1C;
+            border-radius: 50%;
+            opacity: 0.7;
+            animation: fall linear infinite;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh);
+            }
+        }
+
+        .product-spotlight {
+            position: relative;
+            overflow: hidden;
+            padding: 2em;
+            margin: 2em 0;
+            background-color: var(--secondary-color);
+            color: var(--background-color);
+            border-radius: 10px;
+        }
+
+        .product-spotlight::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 80%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .product-spotlight-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .parallax-section {
+            height: 400px;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--background-color);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .parallax-content {
+            z-index: 2;
+        }
+
+        .parallax-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .reviews-section {
+            padding: 4em 0;
+            background-color: var(--background-color);
+        }
+
+        .review-card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 2em;
+            margin: 1em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .review-content {
+            font-style: italic;
+            margin-top: 1em;
+        }
+
+        .review-rating {
+            color: var(--accent-color);
+            font-size: 1.2em;
+            margin-top: 0.5em;
+        }
+
+        .down{
+            padding-top: 50px;
+        }
+
+        .samarkand{
+            margin-left: 15px;
+            margin-top: 15px;
+            
+
+        }
+    </style>
+</head>
+<body>
+    <canvas id="chocolate-3d"></canvas>
+    <div class="chocolate-rain"></div>
+    <header>
+        <div class="header-content">
+            <h1>Chocolate</h1>
+            <p class="samarkand">Samarkand</p>
+        </div>
+        <button id="cart-button" onclick="openCart()">
+            🛒 Корзина <span id="cart-count">0</span>
+        </button>
+    </header>
+    
+    <nav class="down">
+        <button onclick="filterProducts('all')">Все</button>
+        <button onclick="filterProducts('cakes')">Торты</button>
+        <button onclick="filterProducts('chocolates')">Шоколад</button>
+        <button onclick="filterProducts('truffles')">Трюфели</button>
+        <button onclick="filterProducts('pralines')">Пралине</button>
+        <button onclick="filterProducts('pastries')">Пирожные</button>
+        <button onclick="filterProducts('specials')">Специальные</button>
+    </nav>
+
+    <main>
+        <section id="products" class="product-container">
+        </section>
+        <button id="loadMore" onclick="loadMore()">Показать еще</button>
+
+        <div class="parallax-section" style="background-image: url('https://puzzleit.ru/files/puzzles/227/227287/_original.jpg');">
+            <div class="parallax-overlay"></div>
+            <div class="parallax-content">
+                <h2>Откройте для себя мир изысканного шоколада</h2>
+                <p>Каждый кусочек - это путешествие в мир вкуса</p>
+            </div>
+        </div>
+
+        <div class="product-spotlight">
+            <div class="product-spotlight-content">
+                <h2>Специальное предложение</h2>
+                <p>Попробуйте наш новый шоколадный шедевр - "Золотой трюфель"</p>
+                <button class="add-to-cart" onclick="addSpotlightToCart()">Добавить в корзину</button>
+            </div>
+        </div>
+
+        <section class="reviews-section">
+            <h2>Отзывы наших клиентов</h2>
+            <div class="review-container">
+            </div>
+        </section>
+
+        <section class="map-container">
+            <h2>Наше расположение</h2>
+            <p>Мы находимся в центре Самарканда, на улице Абу Райхана Беруни, где современность встречается с историей.</p>
+            <div id="map"></div>
+        </section>
+
+        <section>
+            <h2>О нас</h2>
+            <p>Наша кондитерская "Шоколадный Samarkand" расположена в сердце Самарканда, на улице Абу Райхана Беруни. Мы сочетаем в себе богатство местных традиций и современные тенденции кондитерского искусства.</p>
+            <p>Мы предлагаем широкий ассортимент изысканных шоколадных изделий, тортов и десертов, созданных из высококачественных ингредиентов. Наши мастера-кондитеры постоянно экспериментируют с новыми вкусами и текстурами, чтобы удивлять и радовать наших клиентов.</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Шоколадный Шик. Все права защищены.</p>
+        <p>Ahmad Abdukayumov</p>
+        <div class="social-icons">
+            <a href="" aria-label="Facebook">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+            </a>
+            <a href="" aria-label="Instagram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            </a>
+            <a href="" aria-label="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+            </a>
+            <a href="" aria-label="Telegram">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </a>
+        </div>
+    </footer>
+
+    <div class="overlay" id="overlay"></div>
+    <div id="cart-popup">
+        <h2>Ваш заказ</h2>
+        <div id="cart-items"></div>
+        <div id="cart-total"></div>
+        <button id="close-cart" onclick="closeCart()">Закрыть</button>
+        <button id="order-button" onclick="placeOrder()">Заказать</button>
+    </div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY"></script>
+    <script>
+        const adjectives = ['Шоколадный', 'Кремовый', 'Нежный', 'Воздушный', 'Бархатный', 'Ароматный', 'Изысканный', 'Сливочный', 'Карамельный', 'Фруктовый'];
+        const nouns = ['Трюфель', 'Ганаш', 'Мусс', 'Пралине', 'Безе', 'Брауни', 'Тарт', 'Эклер', 'Макарон', 'Фондан'];
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        shuffleArray(adjectives);
+        shuffleArray(nouns);
+
+        function generateName(category, index) {
+            const adj = adjectives[index % adjectives.length];
+            const noun = nouns[index % nouns.length];
+            switch(category) {
+                case 'cakes': return `${adj} торт "${noun}"`;
+                case 'chocolates': return `${adj} шоколад "${noun}"`;
+                case 'truffles': return `${adj} трюфель "${noun}"`;
+                case 'pralines': return `${adj} пралине "${noun}"`;
+                case 'pastries': return `${adj} пирожное "${noun}"`;
+                case 'specials': return `${adj} десерт "${noun}"`;
+                default: return `${adj} ${noun}`;
+            }
+        }
+
+        function generatePrice() {
+            return Math.floor(Math.random() * (100000 - 10000) + 10000);
+        }
+
+        function generateRandomImage(category) {
+            const width = 200;
+            const height = 200;
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+
+            ctx.fillStyle = getRandomColor(category);
+            ctx.fillRect(0, 0, width, height);
+
+            for (let i = 0; i < 5; i++) {
+                ctx.fillStyle = getRandomColor(category);
+                const x = Math.random() * width;
+                const y = Math.random() * height;
+                const size = Math.random() * 50 + 10;
+                
+                if (Math.random() > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    ctx.fillRect(x, y, size, size);
+                }
+            }
+
+            ctx.globalAlpha = 0.1;
+            for (let i = 0; i < 1000; i++) {
+                ctx.fillStyle = Math.random() > 0.5 ? '#fff' : '#000';
+                ctx.fillRect(Math.random() * width, Math.random() * height, 1, 1);
+            }
+            ctx.globalAlpha = 1;
+
+            return canvas.toDataURL();
+        }
+
+        function getRandomColor(category) {
+            const colors = {
+                cakes: ['#F9E4B7', '#F6D198', '#E8A249', '#C68B59'],
+                chocolates: ['#3C2F2F', '#4B3621', '#3D2B1F', '#483C32'],
+                truffles: ['#4B3621', '#3D2B1F', '#3C2F2F', '#483C32'],
+                pralines: ['#8B4513', '#D2691E', '#A0522D', '#CD853F'],
+                pastries: ['#DEB887', '#D2B48C', '#F4A460', '#CD853F'],
+                specials: ['#8B4513', '#D2691E', '#CD853F', '#DEB887']
+            };
+            const categoryColors = colors[category] || colors.specials;
+            return categoryColors[Math.floor(Math.random() * categoryColors.length)];
+        }
+
+        const products = [
+            ...Array(30).fill().map((_, index) => ({ id: `cakes-${index}`, name: generateName('cakes', index), category: "cakes", price: generatePrice() })),
+            ...Array(30).fill().map((_, index) => ({ id: `chocolates-${index}`, name: generateName('chocolates', index), category: "chocolates", price: generatePrice() })),
+            ...Array(30).fill().map((_, index) => ({ id: `truffles-${index}`, name: generateName('truffles', index), category: "truffles", price: generatePrice() })),
+            ...Array(30).fill().map((_, index) => ({ id: `pralines-${index}`, name: generateName('pralines', index), category: "pralines", price: generatePrice() })),
+            ...Array(30).fill().map((_, index) => ({ id: `pastries-${index}`, name: generateName('pastries', index), category: "pastries", price: generatePrice() })),
+            ...Array(30).fill().map((_, index) => ({ id: `specials-${index}`, name: generateName('specials', index), category: "specials", price: generatePrice() })),
+        ];
+
+        let currentCategory = 'all';
+        let currentPage = 1;
+        const itemsPerPage = 15;
+
+        const cart = {};
+
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (product) {
+                if (cart[productId]) {
+                    cart[productId].quantity++;
+                } else {
+                    cart[productId] = { ...product, quantity: 1 };
+                }
+                updateCartDisplay();
+                animateAddToCart(productId);
+                startChocolateRain();
+            }
+        }
+
+        function animateAddToCart(productId) {
+            const productElement = document.querySelector(`[data-product-id="${productId}"]`);
+            const addToCartButton = productElement.querySelector('.add-to-cart');
+            addToCartButton.classList.add('add-to-cart-animation');
+            setTimeout(() => {
+                addToCartButton.classList.remove('add-to-cart-animation');
+            }, 500);
+        }
+
+        function updateCartDisplay() {
+            const cartButton = document.getElementById('cart-button');
+            const cartCount = document.getElementById('cart-count');
+            const totalItems = Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            
+            if (totalItems > 0) {
+                cartButton.classList.add('has-items');
+            } else {
+                cartButton.classList.remove('has-items');
+            }
+        }
+
+        function displayProducts(productsToShow) {
+            const container = document.getElementById('products');
+            container.innerHTML = '';
+            productsToShow.forEach(product => {
+                const productElement = document.createElement('div');
+                productElement.className = 'product fade-in';
+                productElement.setAttribute('data-product-id', product.id);
+                productElement.innerHTML = `
+                    <div class="product-category">${product.category}</div>
+                    <img src="${generateRandomImage(product.category)}" alt="${product.name}">
+                    <div class="product-info">
+                        <h3>${product.name}</h3>
+                        <p class="product-description">${generateDescription(product.category)}</p>
+                        <div class="price-tag">${product.price.toLocaleString()}</div>
+                        <button class="add-to-cart" onclick="addToCart('${product.id}')">Добавить в корзину</button>
+                    </div>
+                `;
+                container.appendChild(productElement);
+            });
+        }
+
+        function generateDescription(category) {
+            const descriptions = {
+                cakes: "Нежный бисквит с изысканным кремом",
+                chocolates: "Роскошный шоколад высшего качества",
+                truffles: "Изысканные трюфели с нежной начинкой",
+                pralines: "Хрустящее пралине с ореховым вкусом",
+                pastries: "Воздушное пирожное с тающей текстурой",
+                specials: "Уникальный десерт от нашего шеф-кондитера"
+            };
+            return descriptions[category] || "Изысканный шоколадный деликатес";
+        }
+
+        function filterProducts(category) {
+            currentCategory = category;
+            currentPage = 1;
+            updateProductDisplay();
+        }
+
+        function updateProductDisplay() {
+            const filteredProducts = currentCategory === 'all' 
+                ? products 
+                : products.filter(product => product.category === currentCategory);
+            
+            const productsToShow = filteredProducts.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+            displayProducts(productsToShow);
+
+            const loadMoreButton = document.getElementById('loadMore');
+            if (currentPage * itemsPerPage < filteredProducts.length) {
+                loadMoreButton.style.display = 'block';
+            } else {
+                loadMoreButton.style.display = 'none';
+            }
+        }
+
+        function loadMore() {
+            currentPage++;
+            updateProductDisplay();
+        }
+
+        function openCart() {
+            const cartPopup = document.getElementById('cart-popup');
+            const overlay = document.getElementById('overlay');
+            const cartItems = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+
+            cartItems.innerHTML = '';
+            let total = 0;
+
+            for (const [productId, item] of Object.entries(cart)) {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'cart-item fade-in';
+                itemElement.innerHTML = `
+                    <img src="${generateRandomImage(item.category)}" alt="${item.name}">
+                    <div class="cart-item-details">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price.toLocaleString()} UZS x ${item.quantity}</div>
+                    </div>
+                `;
+                cartItems.appendChild(itemElement);
+                total += item.price * item.quantity;
+            }
+
+            cartTotal.textContent = `Итого: ${total.toLocaleString()} UZS`;
+
+            cartPopup.style.display = 'block';
+            overlay.style.display = 'block';
+            setTimeout(() => {
+                cartPopup.classList.add('show');
+                overlay.classList.add('show');
+            }, 10);
+        }
+
+        function closeCart() {
+            const cartPopup = document.getElementById('cart-popup');
+            const overlay = document.getElementById('overlay');
+            cartPopup.classList.remove('show');
+            overlay.classList.remove('show');
+            setTimeout(() => {
+                cartPopup.style.display = 'none';
+                overlay.style.display = 'none';
+            }, 300);
+        }
+
+        function placeOrder() {
+            alert('Ваш заказ оформлен! Спасибо за покупку!');
+            cart = {};
+            updateCartDisplay();
+            closeCart();
+        }
+
+        function initChocolate3D() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('chocolate-3d'), alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const chocolates = [];
+            const chocolateCount = 100;
+
+            for (let i = 0; i < chocolateCount; i++) {
+                const geometry = new THREE.SphereGeometry(Math.random() * 0.5 + 0.1, 32, 32);
+                const material = new THREE.MeshBasicMaterial({ color: getRandomChocolateColor() });
+                const chocolate = new THREE.Mesh(geometry, material);
+                chocolate.position.set(
+                    Math.random() * 20 - 10,
+                    Math.random() * 20 - 10,
+                    Math.random() * 20 - 10
+                );
+                scene.add(chocolate);
+                chocolates.push({
+                    mesh: chocolate,
+                    speed: Math.random() * 0.05 + 0.01
+                });
+            }
+
+            camera.position.z = 5;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                chocolates.forEach(chocolate => {
+                    chocolate.mesh.position.y -= chocolate.speed;
+                    if (chocolate.mesh.position.y < -10) {
+                        chocolate.mesh.position.y = 10;
+                    }
+                    chocolate.mesh.rotation.x += 0.01;
+                    chocolate.mesh.rotation.y += 0.01;
+                });
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+
+            window.addEventListener('resize', function() {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            });
+        }
+
+        function getRandomChocolateColor() {
+            const colors = [0x3D1C1C, 0x4B3621, 0x3C2F2F, 0x483C32, 0x8B4513, 0xD2691E];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function startChocolateRain() {
+            const chocolateRain = document.querySelector('.chocolate-rain');
+            for (let i = 0; i < 50; i++) {
+                const drop = document.createElement('div');
+                drop.classList.add('chocolate-drop');
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.animationDuration = `${Math.random() * 2 + 1}s`;
+                drop.style.animationDelay = `${Math.random() * 2}s`;
+                chocolateRain.appendChild(drop);
+            }
+            setTimeout(() => {
+                chocolateRain.innerHTML = '';
+            }, 3000);
+        }
+
+        function addSpotlightToCart() {
+            const spotlightProduct = {
+                id: 'spotlight-1',
+                name: 'Золотой трюфель',
+                category: 'specials',
+                price: 150000
+            };
+            addToCart(spotlightProduct.id);
+        }
+
+        function initMap() {
+            const mapOptions = {
+                center: { lat: 39.6540379, lng: 66.9741444 },
+                zoom: 15
+            };
+            const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+            const marker = new google.maps.Marker({
+                position: { lat: 39.6540379, lng: 66.9741444 },
+                map: map,
+                title: 'Шоколадный Шик'
+            });
+        }
+
+        function displayReviews() {
+            const reviews = [
+                { author: 'Анна', content: 'Потрясающие десерты! Особенно понравился шоколадный фондан.', rating: 5 },
+                { author: 'Михаил', content: 'Отличное место для любителей сладкого. Рекомендую попробовать трюфели.', rating: 4 },
+                { author: 'Елена', content: 'Уютная атмосфера и великолепный выбор шоколадных изделий.', rating: 5 }
+            ];
+
+            const reviewContainer = document.querySelector('.review-container');
+            reviews.forEach(review => {
+                const reviewElement = document.createElement('div');
+                reviewElement.className = 'review-card';
+                reviewElement.innerHTML = `
+                    <div class="review-author">${review.author}</div>
+                    <div class="review-content">${review.content}</div>
+                    <div class="review-rating">${'★'.repeat(review.rating)}${'☆'.repeat(5 - review.rating)}</div>
+                `;
+                reviewContainer.appendChild(reviewElement);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProductDisplay();
+            updateCartDisplay();
+            initChocolate3D();
+            initMap();
+            displayReviews();
+        });
+
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+                nav.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+                nav.classList.remove('scrolled');
+            }
+        });
+    </script>
+</body>
+</html>
+
